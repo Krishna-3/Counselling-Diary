@@ -17,6 +17,7 @@ router.get('/:id/comments', studentController.getComments);
 router.post('/:id/new', validator.commentValidtor, studentController.postComment);
 
 router.route('/:id/comments/:comId')
+    .get(studentController.getComment)
     .put(validator.commentValidtor, studentController.putComment)
     .delete(studentController.deleteComment);
 

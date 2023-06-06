@@ -1,0 +1,115 @@
+import React, { useState } from 'react';
+import useAxiosPrivate from '../hooks/useAxiosPrivate';
+import { useNavigate } from 'react-router-dom';
+import '../styles/form.css';
+
+function StudentForm() {
+  const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
+  const [name, setName] = useState('');
+  const [rollNumber, setRollNumber] = useState('');
+  const [batch, setBatch] = useState('');
+  const [branch, setBranch] = useState('');
+
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      const response = await axiosPrivate.post('/students/new', JSON.stringify({ name, rollNo: rollNumber, batch, branch }));
+      console.log(response)
+      setName('');
+      setRollNumber('');
+      setBatch('');
+      setBranch('');
+      navigate('/students')
+    } catch (err) {
+      console.log(err)
+    }
+  };
+
+  return (
+    <div className='form'>
+      <div className="card" style={{ backgroundColor: '#f8f8f8' }}>
+        <form className="card-body" onSubmit={handleSubmit}>
+
+          <h2>Create student</h2>
+
+          <div className="card-body">
+            <div className="input-group flex-nowrap">
+              <input
+                className="form-control"
+                type="text"
+                placeholder='Name'
+                value={name}
+                maxLength={30}
+                minLength={3}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="card-body">
+            <div className="input-group flex-nowrap">
+              <input
+                className="form-control"
+                type="text"
+                placeholder='Roll Number'
+                value={rollNumber}
+                onChange={(e) => setRollNumber(e.target.value)}
+                minLength={10}
+                maxLength={10}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="card-body">
+            <div className="input-group flex-nowrap">
+              <input
+                className="form-control"
+                type="text"
+                placeholder='Batch'
+                value={batch}
+                minLength={3}
+                maxLength={3}
+                onChange={(e) => setBatch(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="card-body">
+            <div className="input-group flex-nowrap">
+              <select
+                className="form-select"
+                value={branch}
+                onChange={(e) => setBranch(e.target.value)}
+                required
+              >
+                <option value="">Select Branch</option>
+                <option value="CIC">CIC</option>
+                <option value="CSM">CSM</option>
+                <option value="AID">AID</option>
+                <option value="CSE">CSE</option>
+                <option value="CE">CE</option>
+                <option value="AIM">AI&ML</option>
+                <option value="ECE">ECE</option>
+                <option value="ME">ME</option>
+                <option value="EEE">EEE</option>
+                <option value="IT">IT</option>
+                <option value="CSO">CSO</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="card-body">
+            <button onClick={() => navigate(`/students`)} className="btn btn-primary">go back</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button type="submit" className="btn btn-success">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default StudentForm;

@@ -6,7 +6,7 @@ const handleRefreshToken = async (req, res) => {
     const cookies = req.cookies;
     if (!cookies?.jwt) return res.status(401).json({ 'message': 'Bad request' });
     const refreshToken = cookies.jwt;
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 }); //put secure true
+    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
 
     const foundCounsellor = await Counsellor.findOne({ refreshToken }).exec();
 
@@ -17,7 +17,7 @@ const handleRefreshToken = async (req, res) => {
             process.env.REFRESH_TOKEN_SECRET,
             async (err, decoded) => {
                 if (err) return res.status(403).json({ 'message': 'Forbidden' });
-                const hackedUser = await User.findOne({ username: decoded.username }).exec();
+                const hackedUser = await Counsellor.findOne({ username: decoded.username }).exec();
                 hackedUser.refreshToken = [];
                 const query = await hackedUser.save();
             }
@@ -58,7 +58,7 @@ const handleRefreshToken = async (req, res) => {
             foundCounsellor.refreshToken = [...newRefreshTokenArray, newRefreshToken];
             const query = await foundCounsellor.save();
 
-            res.cookie('jwt', newRefreshToken, { httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 }); //put secure:true
+            res.cookie('jwt', newRefreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
 
             res.json({ accessToken });
         }

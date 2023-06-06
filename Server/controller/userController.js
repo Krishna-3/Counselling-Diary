@@ -40,13 +40,12 @@ const handleLogin = async (req, res) => {
             if (!foundToken) {
                 newRefreshTokenArray = [];
             }
-
-            res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });//put secure:true
+            res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
         }
         foundCounsellor.refreshToken = [...newRefreshTokenArray, newRefreshToken];
         const query = await foundCounsellor.save();
 
-        res.cookie('jwt', newRefreshToken, { httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 }); //put secure:true
+        res.cookie('jwt', newRefreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
         res.json({
             'success': `Counsellor ${username} is logged in!`,
             accessToken
@@ -66,8 +65,8 @@ const handleSignup = async (req, res, next) => {
     const duplicateMail = await Counsellor.findOne({ mail }).exec();
     if (duplicateMail) return res.status(409).json({ 'message': 'User already exists with this mail' });
 
-    const regexUser = /^[A-Za-z][A-Za-z]{2,30}$/g;
-    const regexMail = /^[A-Za-z][A-Za-z0-9.-_]+@[A-za-z]+\.[A-Za-z]{1,}$/g;
+    const regexUser = /^[A-Za-z][A-Za-z ]{2,30}$/g;
+    const regexMail = /^[A-Za-z0-9][A-Za-z0-9.-_]+@[A-za-z]+\.[A-Za-z]{1,}$/g;
     const validUser = regexUser.test(username);
     const validMail = regexMail.test(mail);
     if (!validUser) return res.status(406).json({ 'message': 'Username should contain only alphabets or numbers or underscore and minimun 8 characters required' });
@@ -99,14 +98,14 @@ const handleLogout = async (req, res) => {
     const refreshToken = cookies.jwt;
     const foundCounsellor = await Counsellor.findOne({ refreshToken }).exec();
     if (!foundCounsellor) {
-        res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });//put secure:true
+        res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
         return res.status(204).json({ 'message': 'No content' });
     }
 
     foundCounsellor.refreshToken = foundCounsellor.refreshToken.filter(rt => rt !== refreshToken);;
     const query = await foundCounsellor.save();
 
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 }); //put secure:true
+    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
     res.status(204).json({ 'message': 'No content' });
 };
 

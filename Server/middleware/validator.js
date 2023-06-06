@@ -8,7 +8,7 @@ const studentValidator = (req, res, next) => {
     if (!branches.includes(branch)) return res.status(400).json({ 'message': 'branch should be valid' });
     if (batch[0] !== 'R' || batch.length !== 3) return res.status(400).json({ 'message': 'batch should be valid' });
 
-    regexName = /^[A-Z][A-Za-z ]{2,29}/g;
+    regexName = /^[A-Za-z][A-Za-z ]{2,29}/g;
     validName = regexName.test(name);
     if (!validName) return res.status(400).json({ 'message': 'name should be valid' });
 

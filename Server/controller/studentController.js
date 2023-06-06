@@ -8,7 +8,20 @@ const getStudents = async (req, res, next) => {
 
         const studentList = foundStudents.map((student) => ({ id: student._id, rollNo: student.rollNo }));
 
-        res.json(studentList);
+        const orderedStudentList = studentList.sort((a, b) => {
+            let fa = a.rollNo.toLowerCase(),
+                fb = b.rollNo.toLowerCase();
+
+            if (fa < fb) {
+                return -1;
+            }
+            if (fa > fb) {
+                return 1;
+            }
+            return 0;
+        });
+
+        res.json(orderedStudentList);
     } catch (err) {
         next(err);
     }
@@ -91,13 +104,30 @@ const getComments = async (req, res, next) => {
     try {
         const foundComments = await Comment.find({ student: id });
 
-        const commentList = foundComments.map((comment) => ({ id: comment._id, comment: comment.data }));
+        const commentList = foundComments.map((comment) => ({ id: comment._id, date: comment.date, editedOn: comment.editedOn, comment: comment.data }));
 
         res.json(commentList);
     } catch (err) {
         next(err);
     }
 };
+
+const getComment = async (req, res, next) => {
+    const { id, comId } = req.params;
+    const { cId } = req;
+
+    try {
+        const foundComment = await Comment.findById(comId).exec();
+        const foundStudent = await Student.findById(id).exec();
+
+        if (foundStudent.counsellor.toString() !== cId) return res.status(400).json({ 'message': 'Unauthorized' });
+        if (foundComment.student.toString() !== id) return res.status(400).json({ 'message': 'Student is not found' });
+
+        res.json(foundComment.data)
+    } catch (err) {
+        next(err);
+    }
+}
 
 const postComment = async (req, res, next) => {
     const { id } = req.params;
@@ -165,6 +195,7 @@ module.exports = {
     putStudent,
     deleteStudent,
     getComments,
+    getComment,
     postComment,
     putComment,
     deleteComment
